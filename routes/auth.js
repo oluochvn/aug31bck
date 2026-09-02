@@ -7,8 +7,7 @@ import cors from "cors";
 
 const router = express.Router();
 app.use(cors({
-  origin: "https://aug24pay-theta.vercel.app", // or the exact origin you're testing from
-  credentials: true,
+
 }));
 
 router.get("/profile", protect, async (req, res) => {
