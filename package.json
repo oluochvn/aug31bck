@@ -3,9 +3,9 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
-    "mongoose": "^9.9.4",
-    "session": "^0.1.0"
+    "mongoose": "^9.9.4"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true
