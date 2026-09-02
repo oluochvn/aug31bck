@@ -4,9 +4,34 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
+    "mongoose": "^9.9.4",
     "session": "^0.1.0"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true
-  }
+  },
+  "name": "aug31bck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oluochvn/aug31bck.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/oluochvn/aug31bck/issues"
+  },
+  "homepage": "https://github.com/oluochvn/aug31bck#readme"
 }
