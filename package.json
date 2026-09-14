@@ -6,7 +6,6 @@
   "bugs": {
     "url": "https://github.com/oluochvn/aug31bck/issues"
   },
-  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oluochvn/aug31bck.git"
@@ -23,6 +22,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.10.0",
     "nodemon": "^3.1.14"
@@ -30,6 +30,6 @@
   "allowScripts": {
     "bcrypt@6.0.0": true
   },
-  "devDependencies": {},
-  "keywords": []
+  "keywords": [],
+  "devDependencies": {}
 }
