@@ -64,13 +64,20 @@ app.use(express.json());
                 });
             }
 
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email});
+
+             if(!user){
+                return res.status(400).json({
+                    message: "user not found, please create an account"
+                });
+            }
 
             if (!user || !(await matched(password, user.password))) {
                 return res.status(401).json({
                     message: "Invalid credentials",
                 });
             }
+           
 
             res.status(200).json({
                 message: "Welcome back",
