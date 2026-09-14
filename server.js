@@ -1,9 +1,13 @@
 import express from "express";
+import cors from "cors"
 import mongoose from "mongoose";
 const app = express();
+app.use(cors({
+
+}));
 
 app.get("", (req, res) => {
-  res.send("Hello World");
+  res.send("Test");
 });
 
 const PORT = process.env.PORT || 3000;
