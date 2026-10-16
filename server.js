@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import User from "./db/users.js";
 import { hashed, matched } from "./model/hash.js";
 import { protect } from "./middleware/auth.js";
+import summaryRoutes from "./routes/summaryRoutes.js";
 
 dotenv.config();
 
@@ -103,6 +104,8 @@ app.post("/login", async (req, res) => {
 });
 
 // Protected route: only works with a valid token
+app.use("/", summaryRoutes);
+
 app.get("/me", protect, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
