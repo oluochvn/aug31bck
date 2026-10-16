@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
-import Transaction from "../models/Transaction.js";
-import Goal from "../models/Goal.js";
+import Transaction from "../model/Transaction.js";
+import Goal from "../model/Goal.js";
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
