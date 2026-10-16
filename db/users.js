@@ -17,6 +17,10 @@ import mongoose from "mongoose";
         required: true,
         
     },
+        currency: {
+      type: String,
+      default: "KES",
+    },
   },
  {timestamps:true});
 
