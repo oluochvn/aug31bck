@@ -21,7 +21,7 @@ const transactionSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      trim: true, // e.g. "Housing", "Food & drink", "Salary"
+      trim: true,
     },
     note: {
       type: String,

@@ -79,7 +79,7 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    // password is select:false in the schema, so ask for it explicitly
+
     const user = await User.findOne({ email: email.toLowerCase() }).select(
       "+password"
     );
@@ -103,7 +103,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Protected route: only works with a valid token
 app.use("/", summaryRoutes);
 
 app.get("/me", protect, async (req, res) => {

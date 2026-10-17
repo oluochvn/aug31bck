@@ -9,7 +9,7 @@ export const protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(header.split(" ")[1], process.env.JWT_SECRET);
-    req.userId = decoded.id; // available in every protected controller
+    req.userId = decoded.id; 
     next();
   } catch (err) {
     res.status(401).json({ message: "Session expired, please log in again" });
