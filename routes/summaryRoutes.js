@@ -2,15 +2,15 @@ import express from "express";
 import mongoose from "mongoose";
 import Transaction from "../model/Transaction.js";
 import Goal from "../model/Goal.js";
-import User from "../model/User.js";
+import User from "../db/users.js";
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// GET /summary -> everything the dashboard needs in one call
+
 router.get("/summary", protect, async (req, res) => {
   try {
-    // aggregate() doesn't auto-cast ids, so convert manually
+
     const userId = new mongoose.Types.ObjectId(req.userId);
 
     const [totals, recent, goals, user] = await Promise.all([
@@ -40,7 +40,7 @@ router.get("/summary", protect, async (req, res) => {
   }
 });
 
-// POST /transactions -> add income or expense
+
 router.post("/transactions", protect, async (req, res) => {
   try {
     const { type, amount, category, note, date } = req.body;
