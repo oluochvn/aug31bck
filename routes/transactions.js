@@ -1,11 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
-import Transaction from "../models/Transaction.js";
-import auth from "../middleware/auth.js";
+import Transaction from "../model/Transaction.js";
+import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.use(auth);
+router.use(protect);
 
 const validate = (body) => {
   const { type, amount, category } = body;
@@ -30,7 +30,8 @@ router.get("/", async (req, res) => {
       createdAt: -1,
     });
     res.json(items);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Could not load transactions" });
   }
 });
@@ -42,7 +43,8 @@ router.post("/", async (req, res) => {
   try {
     const tx = await Transaction.create({ ...pick(req.body), user: req.userId });
     res.status(201).json(tx);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Could not save transaction" });
   }
 });
@@ -63,7 +65,8 @@ router.put("/:id", async (req, res) => {
     );
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
     res.json(tx);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Could not update transaction" });
   }
 });
@@ -80,7 +83,8 @@ router.delete("/:id", async (req, res) => {
     });
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
     res.json({ message: "Deleted" });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Could not delete transaction" });
   }
 });

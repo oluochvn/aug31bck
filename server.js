@@ -7,6 +7,7 @@ import User from "./db/users.js";
 import { hashed, matched } from "./model/hash.js";
 import { protect } from "./middleware/auth.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
+import transactionRoutes from "./routes/transactions.js";
 
 dotenv.config();
 
@@ -79,7 +80,6 @@ app.post("/login", async (req, res) => {
       });
     }
 
-
     const user = await User.findOne({ email: email.toLowerCase() }).select(
       "+password"
     );
@@ -103,6 +103,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.use("/transactions", transactionRoutes);
 app.use("/", summaryRoutes);
 
 app.get("/me", protect, async (req, res) => {
