@@ -8,6 +8,7 @@ import { hashed, matched } from "./model/hash.js";
 import { protect } from "./middleware/auth.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
 import goalRoutes from "./routes/goalRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 
 dotenv.config();
 
@@ -105,6 +106,7 @@ app.post("/login", async (req, res) => {
 
 app.use("/", summaryRoutes);
 app.use("/", goalRoutes);
+app.use("/", reportRoutes);
 
 app.get("/me", protect, async (req, res) => {
   try {
