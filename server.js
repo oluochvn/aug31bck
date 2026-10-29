@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import User from "./db/users.js";
 import { hashed, matched } from "./model/hash.js";
 import { protect } from "./middleware/auth.js";
+import transactionsRoutes from "./routes/transactions.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
 import goalRoutes from "./routes/goalRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
@@ -104,6 +105,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.use("/transactions", transactionsRoutes);
 app.use("/", summaryRoutes);
 app.use("/", goalRoutes);
 app.use("/", reportRoutes);
