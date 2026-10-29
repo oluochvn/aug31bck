@@ -40,31 +40,4 @@ router.get("/summary", protect, async (req, res) => {
   }
 });
 
-
-router.post("/transactions", protect, async (req, res) => {
-  try {
-    const { type, amount, category, note, date } = req.body;
-
-    if (!["income", "expense"].includes(type) || !amount || !category) {
-      return res
-        .status(400)
-        .json({ message: "type, amount and category are required" });
-    }
-
-    const transaction = await Transaction.create({
-      user: req.userId,
-      type,
-      amount,
-      category,
-      note,
-      date,
-    });
-
-    res.status(201).json(transaction);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
 export default router;

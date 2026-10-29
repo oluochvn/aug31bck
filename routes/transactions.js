@@ -8,10 +8,20 @@ const router = express.Router();
 router.use(protect);
 
 const validate = (body) => {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return "Transaction details are required";
+  }
+
   const { type, amount, category } = body;
   if (!["income", "expense"].includes(type)) return "Type must be income or expense";
-  if (!(Number(amount) > 0)) return "Amount must be greater than 0";
+  const parsedAmount = Number(amount);
+  if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+    return "Amount must be greater than 0";
+  }
   if (!category || !String(category).trim()) return "Category is required";
+  if (body.date && Number.isNaN(new Date(body.date).getTime())) {
+    return "Date must be valid";
+  }
   return null;
 };
 

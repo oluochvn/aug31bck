@@ -72,4 +72,61 @@ router.patch("/goals/:id/deposit", protect, async (req, res) => {
   }
 });
 
+router.put("/goals/:id", protect, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    const { name, targetAmount } = req.body;
+    const target = Number(targetAmount);
+
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({ message: "Please add a goal name" });
+    }
+    if (!Number.isFinite(target) || target <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Target must be a number greater than 0" });
+    }
+
+    const goal = await Goal.findOneAndUpdate(
+      { _id: req.params.id, user: req.userId },
+      { name: String(name).trim(), targetAmount: target },
+      { new: true, runValidators: true }
+    );
+
+    if (!goal) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    res.json(goal);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.delete("/goals/:id", protect, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    const goal = await Goal.findOneAndDelete({
+      _id: req.params.id,
+      user: req.userId,
+    });
+
+    if (!goal) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    res.json({ message: "Goal deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 export default router;
