@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import User from "./db/users.js";
 import { hashed, matched } from "./model/hash.js";
-import { protect } from "./middleware/auth.js";
+import { protect, requireAdmin } from "./middleware/auth.js";
 import transactionsRoutes from "./routes/transactions.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
 import goalRoutes from "./routes/goalRoutes.js";
@@ -57,8 +57,10 @@ app.post("/register", async (req, res) => {
 
     await User.create({
       username,
-      email,
+      email: email.toLowerCase(),
       password: passwordHash,
+      role: "user",
+      status: "pending",
     });
 
     res.status(201).json({
@@ -92,10 +94,26 @@ app.post("/login", async (req, res) => {
       });
     }
 
+    if (user.status !== "approved") {
+      return res.status(403).json({
+        message: "Your account is pending approval",
+      });
+    }
+
+    user.lastLoginAt = new Date();
+    await user.save();
+
     res.status(200).json({
       message: "Welcome back",
       token: signToken(user._id),
-      user: { id: user._id, username: user.username, email: user.email },
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        lastLoginAt: user.lastLoginAt,
+      },
     });
   } catch (err) {
     console.error(err);
@@ -110,16 +128,120 @@ app.use("/", summaryRoutes);
 app.use("/", goalRoutes);
 app.use("/", reportRoutes);
 
-app.get("/me", protect, async (req, res) => {
+app.get("/me", protect, (req, res) => {
+  res.json({
+    id: req.user._id,
+    username: req.user.username,
+    email: req.user.email,
+    role: req.user.role,
+    status: req.user.status,
+    lastLoginAt: req.user.lastLoginAt,
+  });
+});
+
+app.get("/admin/users", protect, requireAdmin, async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json({ id: user._id, username: user.username, email: user.email });
+    const users = await User.find()
+      .select("username email role status lastLoginAt createdAt updatedAt")
+      .sort({ createdAt: -1 });
+    res.json(users);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/admin/users", protect, requireAdmin, async (req, res) => {
+  const { username, email, password, role = "user" } = req.body;
+
+  try {
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "Please fill all the fields" });
+    }
+    if (!["admin", "user"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+
+    const normalizedEmail = email.toLowerCase();
+    const existingUser = await User.findOne({
+      $or: [{ email: normalizedEmail }, { username }],
+    });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const user = await User.create({
+      username,
+      email: normalizedEmail,
+      password: await hashed(password),
+      role,
+      status: "approved",
+    });
+    res.status(201).json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      lastLoginAt: user.lastLoginAt,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.patch(
+  "/admin/users/:id/approve",
+  protect,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { status: "approved" },
+        { new: true, runValidators: true }
+      ).select("username email role status lastLoginAt");
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      return res.json(user);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+app.delete("/admin/users/:id", protect, requireAdmin, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (
+      user.role === "admin" &&
+      (await User.countDocuments({ role: "admin" })) <= 1
+    ) {
+      return res.status(409).json({ message: "Cannot delete the last admin" });
+    }
+
+    await user.deleteOne();
+    return res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
