@@ -20,11 +20,26 @@ app.use(express.json());
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log("connected to the db");
+    await Promise.all([
+      User.updateMany(
+        { role: { $exists: false } },
+        { $set: { role: "user" } }
+      ),
+      User.updateMany(
+        { status: { $exists: false } },
+        { $set: { status: "approved" } }
+      ),
+      User.updateMany(
+        { lastLoginAt: { $exists: false } },
+        { $set: { lastLoginAt: null } }
+      ),
+    ]);
+    console.log("Existing user records updated");
   })
   .catch((err) => {
-    console.log(err);
+    console.error("Database connection or user migration failed:", err);
   });
 
 const signToken = (userId) =>
