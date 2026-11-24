@@ -10,6 +10,7 @@ import transactionsRoutes from "./routes/transactions.js";
 import summaryRoutes from "./routes/summaryRoutes.js";
 import goalRoutes from "./routes/goalRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 
 dotenv.config();
 
@@ -142,6 +143,8 @@ app.use("/transactions", transactionsRoutes);
 app.use("/", summaryRoutes);
 app.use("/", goalRoutes);
 app.use("/", reportRoutes);
+app.use("/", subscriptionRoutes);
+app.use("/api", subscriptionRoutes);
 
 app.get("/me", protect, (req, res) => {
   res.json({
